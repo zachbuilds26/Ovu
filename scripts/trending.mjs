@@ -14,6 +14,7 @@ import { rankMovers } from '../src/engine/trending.mjs';
 const pct = (n) => `${n >= 0 ? '+' : ''}${(n * 100).toFixed(2)}%`;
 
 const rows = [];
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 for (const m of MEME_UNIVERSE) {
   try {
     const [candles, oi] = await Promise.all([
@@ -29,6 +30,7 @@ for (const m of MEME_UNIVERSE) {
   } catch (err) {
     console.log(`skip ${m.tag.padEnd(12)} ${err.message.slice(0, 90)}`);
   }
+  await wait(300);
 }
 
 console.log(`\n${'='.repeat(72)}`);

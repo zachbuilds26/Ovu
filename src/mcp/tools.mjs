@@ -290,7 +290,9 @@ export function registerTools(server) {
   }, safe('trending', async () => {
     const rows = [];
     const skipped = [];
-    // Sequential across symbols: 12 full snapshots at once would rate-limit.
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    // Sequential across symbols with a breath between them: 12 rapid bursts
+    // from a shared hosting IP read as abuse. 300ms costs ~4s, saves 418s.
     for (const m of MEME_UNIVERSE) {
       try {
         const [candles, oi] = await Promise.all([
@@ -305,6 +307,7 @@ export function registerTools(server) {
       } catch (err) {
         skipped.push(`${m.symbol} (${err.message.slice(0, 80)})`);
       }
+      await wait(300);
     }
 
     const ranked = rankMovers(rows);

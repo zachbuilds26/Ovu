@@ -108,11 +108,12 @@ function requestOnce(address, host, path, timeoutMs) {
 /**
  * @param {string} host   e.g. 'fapi.binance.com'
  * @param {string} path   e.g. '/fapi/v1/premiumIndex?symbol=BTCUSDT'
- * @param {{ timeoutMs?: number }} [opts]
+ * @param {{ timeoutMs?: number, retries?: number }} [opts]
  * @returns {Promise<any>}
  */
 export async function getJson(host, path, opts = {}) {
   const timeoutMs = opts.timeoutMs ?? 12000;
+  const retries = opts.retries ?? 2;
   const addresses = await resolveHost(host);
 
   // Try each address before giving up — one CloudFront edge can be unreachable
@@ -123,7 +124,16 @@ export async function getJson(host, path, opts = {}) {
       return await requestOnce(address, host, path, timeoutMs);
     } catch (err) {
       // A real HTTP error means we reached the server; another address won't help.
-      if (/returned \d{3}|rate limited|non-JSON/.test(err.message)) throw err;
+      if (/returned \d{3}|rate limited|non-JSON/.test(err.message)) {
+        // ...except a throttle, which sometimes clears in seconds. Back off
+        // gently (shared hosting IPs get throttled for neighbours' sins) and
+        // retry the same request before admitting defeat.
+        if (/rate limited/.test(err.message) && retries > 0) {
+          await new Promise((r) => setTimeout(r, retries === 2 ? 2000 : 5000));
+          return getJson(host, path, { timeoutMs, retries: retries - 1 });
+        }
+        throw err;
+      }
       lastError = err;
     }
   }
