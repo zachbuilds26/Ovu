@@ -221,7 +221,7 @@ that can't reach your machine — including Agent OS custom connectors.
 
 ```bash
 claude mcp add ovu -- node /absolute/path/to/ovu/src/mcp/server.mjs
-claude mcp add ovu-live --transport http https://ovu-02yo.onrender.com/mcp
+claude mcp add ovu-live --transport http https://ovu-1.onrender.com/mcp
 ```
 
 **Cursor** — `~/.cursor/mcp.json` (or `.cursor/mcp.json` in this repo):
@@ -234,7 +234,7 @@ claude mcp add ovu-live --transport http https://ovu-02yo.onrender.com/mcp
       "args": ["/absolute/path/to/ovu/src/mcp/server.mjs"]
     },
     "ovu-live": {
-      "url": "https://ovu-02yo.onrender.com/mcp"
+      "url": "https://ovu-1.onrender.com/mcp"
     }
   }
 }
@@ -248,7 +248,7 @@ command = "node"
 args = ["/absolute/path/to/ovu/src/mcp/server.mjs"]
 
 [mcp_servers.ovu-live]
-url = "https://ovu-02yo.onrender.com/mcp"
+url = "https://ovu-1.onrender.com/mcp"
 ```
 
 Then ask: *"use OVU trending — what's moving among the memes?"*
