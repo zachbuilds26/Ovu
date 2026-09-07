@@ -208,11 +208,45 @@ npm run probe                # spawns the MCP server and calls all seven tools
 npm run http                 # serve the tools over HTTP (PORT=3000) for hosting
 ```
 
-Add OVU to Claude Code:
+Add OVU to your agent client. Local stdio is fastest (no cold starts, signal log
+stays in this folder); the hosted URL is the same tools over HTTP, for clients
+that can't reach your machine — including Agent OS custom connectors.
+
+**Claude Code:**
 
 ```bash
 claude mcp add ovu -- node /absolute/path/to/ovu/src/mcp/server.mjs
+claude mcp add ovu-live --transport http https://ovu-02yo.onrender.com/mcp
 ```
+
+**Cursor** — `~/.cursor/mcp.json` (or `.cursor/mcp.json` in this repo):
+
+```json
+{
+  "mcpServers": {
+    "ovu": {
+      "command": "node",
+      "args": ["/absolute/path/to/ovu/src/mcp/server.mjs"]
+    },
+    "ovu-live": {
+      "url": "https://ovu-02yo.onrender.com/mcp"
+    }
+  }
+}
+```
+
+**Codex CLI** — `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.ovu]
+command = "node"
+args = ["/absolute/path/to/ovu/src/mcp/server.mjs"]
+
+[mcp_servers.ovu-live]
+url = "https://ovu-02yo.onrender.com/mcp"
+```
+
+Then ask: *"use OVU trending — what's moving among the memes?"*
 
 If Binance hostnames don't resolve on your machine, `src/data/http.mjs` falls
 back to public DNS automatically. Nothing to configure.
