@@ -213,9 +213,10 @@ npm run probe                # spawns the MCP server and calls all seven tools
 npm run http                 # serve the tools over HTTP (PORT=3000) for hosting
 ```
 
-Add OVU to your agent client. Local stdio is fastest (no cold starts, signal log
-stays in this folder); the hosted URL is the same tools over HTTP, for clients
-that can't reach your machine — including Agent OS custom connectors.
+Add OVU to your agent client. **Local first:** it runs on your machine under your
+own network — no hosting, no cold starts, no shared-IP throttling, and the
+signal log stays in this folder. Use the hosted URL only for clients that
+can't reach your machine (including Agent OS custom connectors).
 
 **Claude Code:**
 
