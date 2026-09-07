@@ -74,6 +74,14 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // Featherweight keep-alive for uptime pings (UptimeRobot etc.): same
+  // liveness signal as /health, minimal bytes, never sleeps the MCP route.
+  if (req.method === 'GET' && url.pathname === '/ping') {
+    res.writeHead(200, { 'content-type': 'text/plain' });
+    res.end('pong');
+    return;
+  }
+
   if (url.pathname !== '/mcp') {
     res.writeHead(404, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ error: 'not found — POST to /mcp, GET /health' }));
