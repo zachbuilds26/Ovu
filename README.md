@@ -2,10 +2,11 @@
 
 **A perpetuals research desk that argues with itself.**
 
-OVU reads BTC, ETH and SOL perpetual futures on Binance for four structural
-patterns, then produces a trading plan that includes the evidence *against* the
-trade, the risk maths, and a signal ID you can look up later to find out whether
-it was right.
+OVU reads BTC, ETH and SOL perpetual futures on Binance — plus a 12-coin meme
+desk (DOGE, SHIB, PEPE, BONK, FLOKI, WIF, POPCAT, TURBO, MEW, BRETT, MEME,
+PNUT) — for four structural patterns, then produces a trading plan that
+includes the evidence *against* the trade, the risk maths, and a signal ID
+you can look up later to find out whether it was right.
 
 Built for the Binance Agent OS Mini Hackathon (Track A).
 
@@ -16,7 +17,7 @@ Built for the Binance Agent OS Mini Hackathon (Track A).
 This section is the point, so it comes first. It is updated only when something
 starts working — never in advance.
 
-**Real right now** — 86 tests passing:
+**Real right now** — 88 tests passing:
 
 - **MCP server**, seven tools over stdio: `scan`, `trending`, `analyze`, `plan`,
   `positioning`, `signal`, `resolve`. `npm run probe` spawns the server through
@@ -27,8 +28,10 @@ starts working — never in advance.
   `resolve` reports what became of each one — read from candle history only.
   When invalidation and target both fall inside one candle the order is
   unknowable, so it reports the loss.
-- **Plans.** `npm run plan` turns a signal report into entry, invalidation,
-  three targets, reward/risk, and a size — or refuses and says why. Levels come
+- **Plans.** `npm run plan` turns a signal report into a signal card (pair,
+  LONG/BUY or SHORT/SELL, entry, TPs, SL, leverage, risk, signal ID) backed by
+  entry, invalidation, up to three targets, reward/risk, and a size — or refuses
+  and says why. Levels come
   from structure, not percentages: the invalidation is the price that proves the
   thesis wrong, buffered by a quarter of ATR, and targets are prior pivots.
   Where structure runs out, the final target is labelled a `3R extension`
@@ -48,7 +51,8 @@ starts working — never in advance.
 - **Data layer.** All nine Binance public futures endpoints below, wrapped one
   function each, returning numbers instead of the strings Binance sends.
   Verified live against BTCUSDT, ETHUSDT and SOLUSDT — `npm run smoke` checks
-  all 27 combinations and prints what came back.
+  all 27 combinations and prints what came back (`npm run smoke -- MEMES`
+  covers the 12-coin meme desk the same way).
 - **HTTP layer.** Explicit DNS resolution with a public-DNS path, because some
   machines refuse to resolve Binance hostnames. TLS still validates against the
   real hostname. No dependencies.
@@ -118,8 +122,8 @@ above support are the same computation with the sign flipped. There is no score
 out of 100 — arbitrary weights are the first thing worth attacking, and the
 counterexample section does that job honestly.
 
-Six MCP tools: `scan`, `analyze`, `plan`, `positioning`, `signal`, `resolve` —
-plus `trending`, the meme-discovery seventh. Every tool answer follows the same
+Seven MCP tools: `scan`, `trending`, `analyze`, `plan`, `positioning`, `signal`,
+`resolve`. Every tool answer follows the same
 shape (verdict, evidence with sources, full counter-case, one next step), ends
 with a fixed not-financial-advice notice, and says plainly when a live read fails
 instead of inventing the missing numbers.
@@ -143,8 +147,9 @@ Every input is Binance public futures data. No API key, no account, no auth.
 | `/fapi/v1/exchangeInfo` | Tick size, quantity step, minimum notional |
 
 Minimum notional, read live rather than assumed: **BTCUSDT 50, ETHUSDT 20,
-SOLUSDT 5** USDT. A $50 stake is legal on all three at 1x, which is worth
-knowing before planning around leverage.
+SOLUSDT 5, every meme coin 5** USDT. A $50 stake is legal on all three majors
+at 1x, which is worth knowing before planning around leverage — and the $5
+meme minimums mean small stakes can follow those signals for real.
 
 ---
 
@@ -198,7 +203,7 @@ No dependencies for the research engine. Node 20 or newer.
 
 ```bash
 npm install                  # @modelcontextprotocol/sdk and zod only
-node --test                  # 86 unit tests, no network
+node --test                  # 88 unit tests, no network
 npm run smoke                # proves every live endpoint responds
 npm run scan                 # all four signals on live BTC/ETH/SOL
 npm run trending             # which of the 12 memes is moving
