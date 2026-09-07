@@ -1,0 +1,25 @@
+{
+  "name": "ovu",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Perpetuals research desk — reads BTC/ETH/SOL perps for four structural patterns and produces trading plans that include the case against themselves.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "smoke": "node scripts/smoke.mjs",
+    "scan": "node scripts/scan.mjs",
+    "trending": "node scripts/trending.mjs",
+    "plan": "node scripts/plan.mjs",
+    "probe": "node scripts/probe.mjs",
+    "agentos-probe": "node scripts/agentos-probe.mjs",
+    "mcp": "node src/mcp/server.mjs",
+    "http": "node src/mcp/http.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.5.4"
+  }
+}

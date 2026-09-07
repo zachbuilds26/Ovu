@@ -1,0 +1,6 @@
+node_modules/
+.env
+.env.local
+*.log
+signals.json
+.DS_Store
