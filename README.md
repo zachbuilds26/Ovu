@@ -10,6 +10,18 @@ you can look up later to find out whether it was right.
 
 Built for the Binance Agent OS Mini Hackathon (Track A).
 
+## Quick start
+
+```bash
+git clone https://github.com/zachbuilds26/Ovu.git ovu
+cd ovu
+npm install
+claude mcp add ovu -- node /absolute/path/to/ovu/src/mcp/server.mjs
+```
+
+Then ask your client: *"use OVU trending — what's moving among the memes?"*
+Full setup for Claude Code, Cursor and Codex is further down.
+
 ---
 
 ## What's actually real
