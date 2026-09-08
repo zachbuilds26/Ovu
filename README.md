@@ -22,6 +22,25 @@ claude mcp add ovu -- node /absolute/path/to/ovu/src/mcp/server.mjs
 Then ask your client: *"use OVU trending — what's moving among the memes?"*
 Full setup for Claude Code, Cursor and Codex is further down.
 
+## Use it as a skill (simplest — no MCP setup)
+
+The same engine ships as a Claude skill. Install it, restart Claude, then ask
+bare questions like *"what's trending with memes?"* — no tool names needed.
+
+```bash
+# Mac/Linux — from the ovu repo root
+mkdir -p ~/.claude/skills/ovu
+cp skills/ovu/SKILL.md ~/.claude/skills/ovu/SKILL.md
+```
+
+```powershell
+# Windows PowerShell — from the ovu repo root
+mkdir $env:USERPROFILE\.claude\skills\ovu -Force
+Copy-Item skills\ovu\SKILL.md $env:USERPROFILE\.claude\skills\ovu\SKILL.md
+```
+
+Restart Claude Code, confirm with `/skills` (look for `ovu`), then ask away.
+
 ---
 
 ## What's actually real
