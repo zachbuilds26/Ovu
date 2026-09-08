@@ -213,16 +213,13 @@ npm run probe                # spawns the MCP server and calls all seven tools
 npm run http                 # serve the tools over HTTP (PORT=3000) for hosting
 ```
 
-Add OVU to your agent client. **Local first:** it runs on your machine under your
-own network — no hosting, no cold starts, no shared-IP throttling, and the
-signal log stays in this folder. Use the hosted URL only for clients that
-can't reach your machine (including Agent OS custom connectors).
+Add OVU to your agent client. It runs locally on your machine: your own network,
+no hosting, no cold starts, and the signal log stays in this folder.
 
 **Claude Code:**
 
 ```bash
 claude mcp add ovu -- node /absolute/path/to/ovu/src/mcp/server.mjs
-claude mcp add ovu-live --transport http https://ovu-1.onrender.com/mcp
 ```
 
 **Cursor** — `~/.cursor/mcp.json` (or `.cursor/mcp.json` in this repo):
@@ -233,9 +230,6 @@ claude mcp add ovu-live --transport http https://ovu-1.onrender.com/mcp
     "ovu": {
       "command": "node",
       "args": ["/absolute/path/to/ovu/src/mcp/server.mjs"]
-    },
-    "ovu-live": {
-      "url": "https://ovu-1.onrender.com/mcp"
     }
   }
 }
@@ -247,9 +241,6 @@ claude mcp add ovu-live --transport http https://ovu-1.onrender.com/mcp
 [mcp_servers.ovu]
 command = "node"
 args = ["/absolute/path/to/ovu/src/mcp/server.mjs"]
-
-[mcp_servers.ovu-live]
-url = "https://ovu-1.onrender.com/mcp"
 ```
 
 Then ask: *"use OVU trending — what's moving among the memes?"*
