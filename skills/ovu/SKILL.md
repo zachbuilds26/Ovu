@@ -1,7 +1,6 @@
 ---
 name: ovu
 description: Perpetual futures research desk for Binance — trending meme coins, BTC/ETH/SOL chart signals, full trade plans with entry, targets and stop-loss, plus an honest track record. Use when the user asks what is trending or moving in crypto, wants a trade setup or signal for any perp, asks for entry/TP/SL levels, or asks how past calls performed.
-version: 0.1.0
 ---
 
 # OVU — perpetuals research desk that argues with itself
