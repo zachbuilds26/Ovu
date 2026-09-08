@@ -133,10 +133,9 @@ silence with commentary, scores, or invented numbers.
 OVU never places a trade. It holds no API keys and no credentials, and it has no
 code path that can reach a Binance trading endpoint.
 
-That isn't caution, it's the platform: Binance Agent OS authenticates through a
-browser OAuth consent screen and requires human confirmation on every write. So
-OVU researches, and `binance-mcp-server` executes in the same client with your
-confirmation. The two sit side by side.
+There is no execution path at all: no Binance login, no sub-account, nothing
+to fund and nothing to confirm. Plans are research outputs — the
+not-financial-advice notice on every answer says the rest.
 
 ---
 
@@ -210,26 +209,10 @@ in it. **OVU needs none of it**: every input it uses is public market data, so i
 works for anyone who clones this repo, with nothing to connect and nothing to
 authorise.
 
-If you want to act on a plan, add Binance's own server alongside OVU:
-
-```bash
-claude mcp add binance-mcp-server --transport http https://agent.binance.com/mcp/agentic
-```
-
-Then the split is:
-
-| | |
-|---|---|
-| **OVU** | Reads public market data, computes signals, sizes risk, keeps the log. No credentials. |
-| **`binance-mcp-server`** | Reads your Agentic sub-account and executes, asking you to confirm each time. |
-| **Your AI client** | Carries a plan from one to the other. |
-
-Trading happens inside an *Agentic virtual sub* account you fund by hand from the
-Binance web UI — there is no testnet, so keep it small. There is no withdrawal
-scope at any point, and Binance provides its own emergency stop under
-**Profile → Dashboard → Sub-account → Account Management** that disconnects every
-agent and cancels everything. OVU deliberately does not reimplement it; theirs is
-stronger.
+If you want to act on a plan, that happens entirely outside OVU: there is no
+account to connect, no order flow to confirm, no sub-account to fund. OVU
+researches from public data; what anyone does with a signal card is their
+business, under the not-financial-advice notice every answer carries.
 
 **OVU has no order endpoint and holds no keys.** That isn't a statement of intent,
 it's a fact about the code — there is no signing function in this repository.
