@@ -4,8 +4,9 @@
 
 OVU reads BTC, ETH and SOL perpetual futures on Binance — plus a 12-coin meme
 desk (DOGE, SHIB, PEPE, BONK, FLOKI, WIF, POPCAT, TURBO, MEW, BRETT, MEME,
-PNUT) — for four structural patterns, then produces a trading plan that
-includes the evidence *against* the trade, the risk maths, and a signal ID
+PNUT) — for four structural patterns, then produces a trading plan that leads
+with a signal card (pair, LONG/BUY or SHORT/SELL, entry, TPs, SL, size, risk)
+and includes the evidence *against* the trade, the risk maths, and a signal ID
 you can look up later to find out whether it was right.
 
 Built for the Binance Agent OS Mini Hackathon (Track A).
@@ -15,36 +16,12 @@ Built for the Binance Agent OS Mini Hackathon (Track A).
 ```bash
 git clone https://github.com/zachbuilds26/Ovu.git ovu
 cd ovu
-npm install
+npm install                  # @modelcontextprotocol/sdk and zod only
 claude mcp add ovu -- node /absolute/path/to/ovu/src/mcp/server.mjs
 ```
 
-Then ask your client: *"use OVU trending — what's moving among the memes?"*
-Full setup for Claude Code, Cursor and Codex is further down.
-
-## Use it as a skill (simplest — no MCP setup)
-
-The same engine ships as a Claude skill. Install it, restart Claude, then ask
-bare questions like *"what's trending with memes?"* — no tool names needed.
-
-```bash
-# Mac/Linux — from the ovu repo root
-mkdir -p ~/.claude/skills/ovu
-cp skills/ovu/SKILL.md ~/.claude/skills/ovu/SKILL.md
-```
-
-```powershell
-# Windows PowerShell — from the ovu repo root
-mkdir $env:USERPROFILE\.claude\skills\ovu -Force
-Copy-Item skills\ovu\SKILL.md $env:USERPROFILE\.claude\skills\ovu\SKILL.md
-```
-
-Restart Claude Code, confirm with `/skills` (look for `ovu`), then ask away.
-
-Not on Claude? The skill file is plain markdown plus shell commands —
-`skills/ovu/SKILL.md` doubles as instructions any agent can read and follow,
-and `node scripts/trending.mjs` (or `scan`, `plan`) runs in any terminal with
-Node 20+. Only the auto-loading is Claude-specific; the engine is anyone's.
+Then ask your client: *"what's trending with memes?"* No tool names needed once
+the skill or MCP server is connected — plain questions route on their own.
 
 ---
 
@@ -57,30 +34,42 @@ starts working — never in advance.
 
 - **MCP server**, seven tools over stdio: `scan`, `trending`, `analyze`, `plan`,
   `positioning`, `signal`, `resolve`. `npm run probe` spawns the server through
-  the real MCP client and calls every one of them. `npm run http` serves the same
-  tools over Streamable HTTP (`POST /mcp`, `GET /health`) so Agent OS can add OVU
-  as a custom connector — one server definition, two transports.
+  the real MCP client and calls every one of them against a throwaway log, so
+  test runs never pollute the real track record. `npm run http` serves the same
+  tools over Streamable HTTP (`POST /mcp`, `GET /health`, `GET /ping`) — one
+  server definition, two transports. The HTTP door has a 1 MB body cap and a
+  60-requests-per-minute per-IP limit.
+- **Claude skill.** The same engine ships as `skills/ovu/SKILL.md`: install it
+  and bare questions (*"what's trending with memes?"*, *"build me a BONK
+  trade"*) trigger it with no MCP setup. The file is plain markdown plus shell
+  commands, so any agent that can run Node can follow it by reading it — only
+  the auto-loading is Claude-specific.
 - **Signal log.** Every `plan` call records its setup under a signal ID, and
   `resolve` reports what became of each one — read from candle history only.
   When invalidation and target both fall inside one candle the order is
-  unknowable, so it reports the loss.
-- **Plans.** `npm run plan` turns a signal report into a signal card (pair,
-  LONG/BUY or SHORT/SELL, entry, TPs, SL, leverage, risk, signal ID) backed by
+  unknowable, so it reports the loss. Recording is idempotent: the same setup
+  twice returns the existing entry, never a duplicate.
+- **Plans.** `npm run plan` turns a signal report into a signal card followed by
   entry, invalidation, up to three targets, reward/risk, and a size — or refuses
-  and says why. Levels come
-  from structure, not percentages: the invalidation is the price that proves the
-  thesis wrong, buffered by a quarter of ATR, and targets are prior pivots.
-  Where structure runs out, the final target is labelled a `3R extension`
-  instead of being passed off as a level price has traded.
+  and says why. Levels come from structure, not percentages: the invalidation is
+  the price that proves the thesis wrong, buffered by a quarter of ATR, and
+  targets are prior pivots. Where structure runs out, the final target is
+  labelled a `3R extension` instead of being passed off as a level price has
+  traded.
 - **Signal IDs.** A stable, readable identifier per setup — `BTC-RF-75ad`.
   Derived only from data, never the clock, so reading the same setup twice gives
   the same ID while a genuinely different level gives a new one.
 - **The four signals**, symmetric and deterministic, each carrying its own
   counterexamples. `npm run scan` runs them across BTC, ETH and SOL on live data
-  and prints every reading with its source endpoint. A 12-coin meme desk
-  (DOGE, SHIB, PEPE, BONK, FLOKI, WIF, POPCAT, TURBO, MEW, BRETT, MEME, PNUT)
-  rides the same engine: `npm run trending` ranks them by 24h move with volume
-  and open-interest context, and `analyze`/`plan` accept any of those symbols.
+  and prints every reading with its source endpoint. The meme desk rides the
+  same engine: `npm run trending` ranks all 12 by 24h move with closed-candle
+  volume and open-interest context, and `analyze`/`plan` accept any of those
+  symbols.
+- **Answer shape.** Every tool answer follows the same anatomy — verdict, then
+  evidence with source endpoints, then the full counter-case, then one next
+  step — and closes with a fixed not-financial-advice notice. A failed live
+  read says exactly that instead of inventing the missing numbers, and a quiet
+  board says "nothing here" instead of manufacturing interest.
 - **Snapshot layer.** One fetch per symbol into a plain object, so signals are
   pure functions with no network in them — which is what makes the fixtures in
   `test/fixtures.mjs` able to pin down exactly what should and shouldn't fire.
@@ -88,14 +77,19 @@ starts working — never in advance.
   function each, returning numbers instead of the strings Binance sends.
   Verified live against BTCUSDT, ETHUSDT and SOLUSDT — `npm run smoke` checks
   all 27 combinations and prints what came back (`npm run smoke -- MEMES`
-  covers the 12-coin meme desk the same way).
+  covers the 12-coin meme desk the same way, or pass a single symbol).
 - **HTTP layer.** Explicit DNS resolution with a public-DNS path, because some
   machines refuse to resolve Binance hostnames. TLS still validates against the
-  real hostname. No dependencies.
+  real hostname. Throttles (429/418) are retried with backoff before the tool
+  admits defeat. No dependencies.
 - **Indicators.** EMA (seeded from an SMA, warmup left as `null` rather than
   guessed), true range, ATR with Wilder smoothing, confirmed swing pivots,
   baseline volume, percent change. Written out rather than imported so every
   number a signal reports traces to arithmetic you can read.
+- **Adaptive prices.** One shared formatter (`src/engine/format.mjs`) prints
+  BTC-sized numbers as ever and sub-dollar meme prices with their significant
+  digits — no more `0.00` levels on a 0.003-coin. Ratios and percentages keep
+  their own precision; only actual prices go through it.
 - **Risk gate.** Position sizing from risk-per-unit, worst case in quote
   currency, and approximate isolated-margin liquidation price. It refuses
   rather than warns: stop on the wrong side of entry, size under the exchange
@@ -106,13 +100,16 @@ starts working — never in advance.
 **Not real yet:**
 
 - No live track record to speak of. The log starts empty; entries accumulate as
-  `plan` is called. Two days of it will not prove anything and the tool says so.
+  `plan` is called. Days of it will not prove anything and the tool says so.
+- No news input. OVU reads market data only — headlines, macro prints and
+  listing news never enter the engine. Pair it with an agent that browses:
+  news context first, OVU levels second, argued together.
 
 ---
 
 ## Why it's different
 
-Every AI trading tool asserts a signal and moves on. Two things here don't:
+Every AI trading tool asserts a signal and moves on. Three things here don't:
 
 **Counterexamples are an output, not a disclaimer.** Every plan carries a section
 listing the specific readings that argue against it, with the numbers attached.
@@ -122,8 +119,12 @@ setup.
 
 **Every signal gets a stable ID.** Same inputs, same ID. Later you ask OVU what
 happened to it, and it tells you honestly, including when it was wrong. The log
-starts empty on 2026-09-06 and fills forward. There is no backtest and no claimed
-win rate, because three days of data proves nothing.
+starts empty and fills forward. There is no backtest and no claimed
+win rate, because days of data prove nothing.
+
+**It would rather say nothing.** No pattern present, a quiet board, a failed
+read — each has its own explicit sentence, and the rules forbid filling the
+silence with commentary, scores, or invented numbers.
 
 ---
 
@@ -139,9 +140,11 @@ confirmation. The two sit side by side.
 
 ---
 
-## Planned
+## The four signals
 
-Four signals, each deterministic, each with a defined counterexample:
+Each deterministic, each with a defined counterexample, each symmetric — a
+failed rebound below resistance and a failed breakdown above support are the
+same computation with the sign flipped:
 
 1. **Rebound failure** — price reclaims a level, gets rejected, closes back
    through it. Reports the level, the rejection, and the bounce size as a
@@ -153,16 +156,14 @@ Four signals, each deterministic, each with a defined counterexample:
 4. **Positioning shift** — open interest against price direction, cross-checked
    with the top-trader long/short ratio and taker flow.
 
-Signals are symmetric: a failed rebound below resistance and a failed breakdown
-above support are the same computation with the sign flipped. There is no score
-out of 100 — arbitrary weights are the first thing worth attacking, and the
-counterexample section does that job honestly.
+There is no score out of 100 — arbitrary weights are the first thing worth
+attacking, and the counterexample section does that job honestly.
 
-Seven MCP tools: `scan`, `trending`, `analyze`, `plan`, `positioning`, `signal`,
-`resolve`. Every tool answer follows the same
-shape (verdict, evidence with sources, full counter-case, one next step), ends
-with a fixed not-financial-advice notice, and says plainly when a live read fails
-instead of inventing the missing numbers.
+Seven MCP tools: `scan` (majors overview with a named lead), `trending`
+(meme ranking with a named lead), `analyze` (one coin in full, ends with a
+next step), `plan` (signal card + full detail, records the ID), `positioning`
+(funding/OI/flow alone), `signal` (one ID's story), `resolve` (counts, never
+a win rate).
 
 ---
 
@@ -179,8 +180,8 @@ Every input is Binance public futures data. No API key, no account, no auth.
 | `/futures/data/openInterestHist` | Open interest over time |
 | `/futures/data/topLongShortPositionRatio` | Large-account positioning |
 | `/futures/data/takerlongshortRatio` | Aggressive buy vs sell flow |
-| `/fapi/v1/depth` | Order book |
-| `/fapi/v1/exchangeInfo` | Tick size, quantity step, minimum notional |
+| `/fapi/v1/depth` | Order book (proven by smoke; the engine doesn't consume it) |
+| `/fapi/v1/exchangeInfo` | Tick size, quantity step, minimum notional (refreshed hourly) |
 
 Minimum notional, read live rather than assumed: **BTCUSDT 50, ETHUSDT 20,
 SOLUSDT 5, every meme coin 5** USDT. A $50 stake is legal on all three majors
@@ -289,7 +290,32 @@ command = "node"
 args = ["/absolute/path/to/ovu/src/mcp/server.mjs"]
 ```
 
-Then ask: *"use OVU trending — what's moving among the memes?"*
+Then ask: *"what's trending with memes?"* — plain questions route on their own,
+no tool names needed.
+
+## Use it as a skill (simplest — no MCP setup)
+
+The same engine ships as a Claude skill. Install it, restart Claude, then ask
+bare questions like *"what's trending with memes?"* — no tool names needed.
+
+```bash
+# Mac/Linux — from the ovu repo root
+mkdir -p ~/.claude/skills/ovu
+cp skills/ovu/SKILL.md ~/.claude/skills/ovu/SKILL.md
+```
+
+```powershell
+# Windows PowerShell — from the ovu repo root
+mkdir $env:USERPROFILE\.claude\skills\ovu -Force
+Copy-Item skills\ovu\SKILL.md $env:USERPROFILE\.claude\skills\ovu\SKILL.md
+```
+
+Restart Claude Code, confirm with `/skills` (look for `ovu`), then ask away.
+
+Not on Claude? The skill file is plain markdown plus shell commands —
+`skills/ovu/SKILL.md` doubles as instructions any agent can read and follow,
+and `node scripts/trending.mjs` (or `scan`, `plan`) runs in any terminal with
+Node 20+. Only the auto-loading is Claude-specific; the engine is anyone's.
 
 If Binance hostnames don't resolve on your machine, `src/data/http.mjs` falls
 back to public DNS automatically. Nothing to configure.
