@@ -216,6 +216,16 @@ npm run http                 # serve the tools over HTTP (PORT=3000) for hosting
 Add OVU to your agent client. It runs locally on your machine: your own network,
 no hosting, no cold starts, and the signal log stays in this folder.
 
+First, install it (Node 20 or newer required):
+
+```bash
+git clone https://github.com/zachbuilds26/Ovu.git ovu
+cd ovu
+npm install
+```
+
+Then register it with your client:
+
 **Claude Code:**
 
 ```bash
