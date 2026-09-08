@@ -6,6 +6,12 @@ version: 0.1.0
 
 # OVU — perpetuals research desk that argues with itself
 
+> Portability note: the frontmatter above is Claude's auto-load convention, but
+> everything below is plain markdown plus shell commands. Any agent on any
+> harness that can run Node scripts can use this file by reading it and
+> following it — `node scripts/trending.mjs` works in any terminal, no Claude
+> required.
+
 Live Binance futures data (no login, no keys) read for four structural patterns
 — rebound failure, trend suppression, funding pressure, positioning shift —
 across BTC, ETH, SOL and a 12-coin meme desk (DOGE, SHIB, PEPE, BONK, FLOKI,

@@ -41,6 +41,11 @@ Copy-Item skills\ovu\SKILL.md $env:USERPROFILE\.claude\skills\ovu\SKILL.md
 
 Restart Claude Code, confirm with `/skills` (look for `ovu`), then ask away.
 
+Not on Claude? The skill file is plain markdown plus shell commands —
+`skills/ovu/SKILL.md` doubles as instructions any agent can read and follow,
+and `node scripts/trending.mjs` (or `scan`, `plan`) runs in any terminal with
+Node 20+. Only the auto-loading is Claude-specific; the engine is anyone's.
+
 ---
 
 ## What's actually real
